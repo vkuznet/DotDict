@@ -16,6 +16,7 @@ examples:
 
     .. doctest::
 
+        from ddict import DotDict
         row = {'a':{'b':1, 'c':[1,2]}}
         rec = DotDict(row)
         print rec['a.c']
@@ -24,7 +25,7 @@ examples:
         print rec
         {'a':{'b':1, 'c':[1,2]}, 'x': {'y': {'z': 1}}
 
-For a complete list of examples, see DotDict_t.py unit test module.    
+For a complete list of examples, see ddict_t.py unit test module.    
 """
 
 from types import GeneratorType
