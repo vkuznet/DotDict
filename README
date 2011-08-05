@@ -1,0 +1,22 @@
+Description:
+------------
+
+DotDict is an extension of python dictionary which uses and operates
+with dot notations. For example, DotDict.get('a.b.c') or simply 
+DotDict['a.b.c']. It extends set/get operations to set/assign new
+values, as well as provide get_keys/get_values/delete APIs. It also
+smart enough to work with complex dict structures. Here is a few
+examples:
+
+    .. doctest::
+
+        row = {'a':{'b':1, 'c':[1,2]}}
+        rec = DotDict(row)
+        print rec['a.c']
+        [1,2]
+        rec['x.y.z'] = 1
+        print rec
+        {'a':{'b':1, 'c':[1,2]}, 'x': {'y': {'z': 1}}
+
+For a complete list of examples, see DotDict_t.py unit test module.    
+
