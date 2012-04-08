@@ -24,7 +24,7 @@ class Test_DotDict(unittest.TestCase):
     def test_get_keys(self):
         """test get_keys method"""
         rec = DotDict(self.rec1)
-        expect = ['a.b', 'a.c']
+        expect = ['a', 'a.b', 'a.c']
         expect.sort()
         result = rec.get_keys()
         result.sort()

@@ -8,7 +8,7 @@ Description:
 ------------
 
 DotDict is an extension of python dictionary which uses and operates
-with dot notations. For example, DotDict.get('a.b.c') or simply 
+with dot notations. For example, DotDict.get('a.b.c') or simply
 DotDict['a.b.c']. It extends set/get operations to set/assign new
 values, as well as provide get_keys/get_values/delete APIs. It also
 smart enough to work with complex dict structures. Here is a few
@@ -25,7 +25,7 @@ examples:
         print rec
         {'a':{'b':1, 'c':[1,2]}, 'x': {'y': {'z': 1}}
 
-For a complete list of examples, see ddict_t.py unit test module.    
+For a complete list of examples, see DotDict_t.py unit test module.
 """
 
 from types import GeneratorType
@@ -55,7 +55,7 @@ def convert_dot_notation(key, val):
 
 def yield_obj(rdict, ckey):
     """
-    Helper function for DotDict class. For a given dict and compound key, 
+    Helper function for DotDict class. For a given dict and compound key,
     e.g. a.b.c, extract and yield next key and its object(s).
     """
     keys = ckey.split('.')
@@ -71,6 +71,17 @@ def yield_obj(rdict, ckey):
                 yield next_key, item
         else:
             yield next_key, obj
+
+def helper_loop(combo, vals):
+    "Helper function"
+    if  isinstance(vals, dict):
+        for kkk in DotDict(vals).get_keys():
+            yield '%s.%s' % (combo, kkk)
+    elif isinstance(vals, list):
+        for item in vals:
+            if  isinstance(item, dict):
+                for kkk in DotDict(item).get_keys():
+                    yield '%s.%s' % (combo, kkk)
 
 class DotDict(dict):
     """
@@ -141,21 +152,28 @@ class DotDict(dict):
         if  isinstance(doc, dict):
             for key in doc.keys():
                 if  ckey.rfind('%s.' % key) == -1:
-                    yield '%s.%s' % (ckey, key)
-                    for kkk in self.get_keys('%s.%s' % (ckey, key)):
+                    combo = '%s.%s' % (ckey, key)
+                    yield combo
+                    vals = [v for v in self.get_values(combo)]
+                    for kkk in helper_loop(combo, vals):
                         yield kkk
+                else:
+                    yield ckey
         elif isinstance(doc, list):
             for item in doc:
                 if  isinstance(item, dict):
                     for key in item.keys():
                         if  ckey.rfind('%s.' % key) == -1:
-                            yield '%s.%s' % (ckey, key)
-                            for kkk in self.get_keys('%s.%s' % (ckey, key)):
+                            combo = '%s.%s' % (ckey, key)
+                            yield combo
+                            vals = [v for v in self.get_values(combo)]
+                            for kkk in helper_loop(combo, vals):
                                 yield kkk
                 elif isinstance(item, list):
                     for elem in item:
                         if  isinstance(elem, dict):
-                            yield '%s.%s' % (ckey, elem)
+                            for kkk in elem.keys():
+                                yield '%s.%s' % (ckey, kkk)
                         else:
                             yield ckey
                 else: # basic type, so we reach the end
@@ -178,7 +196,7 @@ class DotDict(dict):
                 obj = super(DotDict, obj).__getitem__(key)
             else:
                 obj = obj.__getitem__(key)
-        
+
     def get(self, ckey, default=None):
         """
         Get value for provided compound key. In a case of
@@ -231,7 +249,7 @@ class DotDict(dict):
         if  ckey:
             keys = self._get_keys(ckey)
         else:
-            keys = []
+            keys = self.keys()
             for key in self.keys():
                 keys += [k for k in self._get_keys(key)]
         return list(set(keys))
